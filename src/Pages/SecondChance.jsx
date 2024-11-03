@@ -1,0 +1,94 @@
+import React from 'react';
+import { useSelector } from 'react-redux';
+import Box from '../Components/Box'; // Assuming Box component is used for rendering frames
+
+const SecondChance = () => {
+    const frames = useSelector((state) => state.frames);
+    const ref = useSelector((state) => state.ref);
+    const col = ref.length;
+
+    let faults = 0;
+    let totalHit = 0;
+
+    const grid = () => {
+        const arr = [];
+        const pages = new Array(frames).fill(-1);
+        const referenceBits = new Array(frames).fill(0);
+        let framePointer = 0; // Pointer to track the next frame to replace
+
+        for (let i = 0; i < col; i++) {
+            const temp = [];
+            const currentPage = ref[i];
+            let hit = false;
+            let remark = "Fault";
+
+            // Check for hit in current frames
+            for (let j = 0; j < frames; j++) {
+                if (pages[j] === currentPage) {
+                    hit = true;
+                    remark = "Hit";
+                    totalHit++;
+                    referenceBits[j] = 1; // Set reference bit to 1
+                    break;
+                }
+            }
+
+            if (!hit) {
+                // Find the next frame to replace using the Second Chance algorithm
+                while (true) {
+                    // Check if the current frame has been referenced
+                    if (referenceBits[framePointer] === 1) {
+                        // Give a second chance: reset the reference bit and move to the next frame
+                        referenceBits[framePointer] = 0;
+                        framePointer = (framePointer + 1) % frames;
+                    } else {
+                        // Replace the page in this frame
+                        pages[framePointer] = currentPage;
+                        faults++;
+                        framePointer = (framePointer + 1) % frames;
+                        break;
+                    }
+                }
+            }
+
+            // Prepare the grid for rendering
+            temp.push(<Box j={currentPage} color={"green"} />);
+            for (let j = 0; j < frames; j++) {
+                if (hit && pages[j] === currentPage) {
+                    temp.push(<Box i={pages[j]} remark={remark} color="#FF5733" />);
+                } else {
+                    temp.push(<Box i={pages[j]} />);
+                }
+            }
+            temp.push(<Box remark={remark} color="#008000" />);
+            arr.push(temp);
+        }
+        return arr;
+    }
+
+    return (
+        <>
+            <div className="flex flex-col justify-center items-center gap-2 m-1">
+                <div>
+                    <h1 className="text-2xl font-bold">Second Chance Page Replacement Algorithm</h1>
+                  
+                </div>
+                <div className="flex">
+                    {
+                        grid().map((row, index) => (
+                            <div key={index} className={`flex flex-col justify-center items-center gap-2 m-1`}>
+                                {row}
+                            </div>
+                        ))
+                    }
+                </div>
+                <div>
+                <h2 className="text-lg font-bold">Total Page Faults: {faults}</h2>
+                <h2 className="text-lg font-bold">Total Page Hits: {totalHit}</h2>
+                </div>
+            </div>
+        </>
+    );
+};
+
+export default SecondChance;
