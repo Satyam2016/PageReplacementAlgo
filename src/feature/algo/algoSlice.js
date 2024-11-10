@@ -1,8 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-    frames: 3,
-    ref: [2,3,4,5,6,7,8,8,9,0],
+    frames: 2,
+    ref: [2,3,4,5,3,2],
 };
 
 export const algoSlice = createSlice({

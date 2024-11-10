@@ -1,14 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Box from '../Components/Box'; // Assuming Box component is used for rendering frames
+import Generategrid from '../Components/Generategrid';
+import Loader from '../Components/Loader';
+
+
 
 const Optimal = () => {
     const frames = useSelector((state) => state.frames);
     const ref = useSelector((state) => state.ref);
     const col = ref.length;
-    
+    const [loading, setLoading] = useState(true);
+
     let faults = 0;
     let totalHit = 0;
+
 
     const grid = () => {
         const arr = [];
@@ -64,15 +70,15 @@ const Optimal = () => {
             }
 
             // Prepare the grid for rendering
-            temp.push(<Box  j={currentPage} color={"green"} />);
+            temp.push(<Box j={currentPage} color={"green"} />);
             for (let j = 0; j < frames; j++) {
                 const color = hit && pages[j] === currentPage ? "#FF5733" : undefined;
-                if(remark==="Hit" && pages[j] === currentPage){
-                    temp.push(<Box  i={pages[j]} remark={remark} color="#FF5733" />);
-                }else{
-                    temp.push(<Box  i={pages[j]} />);
+                if (remark === "Hit" && pages[j] === currentPage) {
+                    temp.push(<Box i={pages[j]} remark={remark} color="#FF5733" />);
+                } else {
+                    temp.push(<Box i={pages[j]} />);
                 }
-                
+
             }
             temp.push(<Box remark={remark} color="#008000" />);
             arr.push(temp);
@@ -80,25 +86,21 @@ const Optimal = () => {
         return arr;
     };
 
+    useEffect(() => {
+        setTimeout(() => {
+             setLoading(false);
+        }, 1000);
+   }, []);
+
+
+
+
     return (
         <>
-            <div className="flex flex-col justify-center items-center gap-2 m-1">
-                <div>
-                    <h1 className="text-2xl font-bold">Optimal Page Replacement Algorithm</h1>
-                </div>
-                <div className="flex">
-                    {
-                        grid().map((row, index) => (
-                            <div key={index} className="flex flex-col justify-center items-center gap-2 m-1">
-                                {row}
-                            </div>
-                        ))
-                    }
-                </div>
-                <div>
-                    <h2 className="text-lg font-bold">Total Page Faults: {faults}</h2>
-                    <h2 className="text-lg font-bold">Total Page Hits: {totalHit}</h2>
-                </div>
+        {loading && <Loader />}
+            <div className="flex flex-col items-center gap-2 m-1 p-6  rounded-lg max-w-6xl mx-auto">
+                <h1 className="text-2xl font-bold  mb-4">Optimal Page Replacement Algorithm</h1>
+                < Generategrid Grid={grid()} />
             </div>
         </>
     );

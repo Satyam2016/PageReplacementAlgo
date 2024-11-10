@@ -3,10 +3,10 @@ import InputBox from '../Components/InputBox';
 
 const Home = () => {
      return (
-     <>
-          <InputBox />
-     </>
+          <>
+               <InputBox />
+          </>
      );
-     };
+};
 
 export default Home;
